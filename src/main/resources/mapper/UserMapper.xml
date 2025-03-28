@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userMapper">
+
+    <resultMap id="userResultMap" type="com.example.spring.user.UserDto">
+        <result property="userId" column="USER_ID" />
+        <result property="password" column="PASSWORD" />
+        <result property="username" column="USERNAME" />
+        <result property="phone" column="PHONE" />
+        <result property="email" column="EMAIL" />
+        <result property="createdAt" column="CREATED_AT" />
+        <result property="updatedAt" column="UPDATED_AT" />
+    </resultMap>
+
+    <!-- 사용자 등록 -->
+    <insert id="create" parameterType="com.example.spring.user.UserDto">
+        <![CDATA[
+        INSERT INTO USERS (
+            USER_ID,
+            PASSWORD,
+            USERNAME,
+            PHONE,
+            EMAIL
+        ) VALUES (
+            #{userId},
+            #{password},
+            #{username},
+            #{phone},
+            #{email}
+        )
+        ]]>
+    </insert>
+
+    <!-- 사용자 목록 -->
+    <select id="list" resultMap="userResultMap">
+        <![CDATA[
+        SELECT
+            USER_ID,
+            PASSWORD,
+            USERNAME,
+            PHONE,
+            EMAIL,
+            CREATED_AT,
+            UPDATED_AT
+        FROM
+            USERS
+        WHERE 1=1
+        ]]>
+        <if test="searchType != null and searchKeyword != null">
+            <choose>
+                <when test="searchType == 'userId'">
+                    <![CDATA[
+                    AND USER_ID LIKE CONCAT('%', #{searchKeyword}, '%')
+                    ]]>
+                </when>
+                <when test="searchType == 'username'">
+                    <![CDATA[
+                    AND USERNAME LIKE CONCAT('%', #{searchKeyword}, '%')
+                    ]]>
+                </when>
+                <when test="searchType == 'phone'">
+                    <![CDATA[
+                    AND PHONE LIKE CONCAT('%', #{searchKeyword}, '%')
+                    ]]>
+                </when>
+                <when test="searchType == 'email'">
+                    <![CDATA[
+                    AND EMAIL LIKE CONCAT('%', #{searchKeyword}, '%')
+                    ]]>
+                </when>
+                <when test="searchType == 'all'">
+                <![CDATA[
+                    AND (
+                        USER_ID LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR USERNAME LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR PHONE LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR EMAIL LIKE CONCAT('%', #{searchKeyword}, '%')
+                    )
+                ]]>
+                </when>
+            </choose>
+        </if>
+        <![CDATA[
+        ORDER BY CREATED_AT DESC
+        LIMIT #{offset}, #{listCountPerPage}
+        ]]>
+    </select>
+
+    <!-- 사용자 보기 -->
+    <select id="read" resultMap="userResultMap" parameterType="com.example.spring.user.UserDto">
+        <![CDATA[
+        SELECT
+            USER_ID,
+            PASSWORD,
+            USERNAME,
+            PHONE,
+            EMAIL,
+            CREATED_AT,
+            UPDATED_AT
+        FROM
+            USERS
+        WHERE 1=1 
+        ]]>
+        <if test="userId != null">
+            <![CDATA[
+            AND USER_ID = #{userId}
+            ]]>
+        </if>
+        <if test="username != null">
+            <![CDATA[
+            AND USERNAME = #{username}
+            ]]>
+        </if>
+        <if test="phone != null">
+            <![CDATA[
+            AND PHONE = #{phone}
+            ]]>
+        </if>
+        <if test="email != null">
+            <![CDATA[
+            AND EMAIL = #{email}
+            ]]>
+        </if>
+        <![CDATA[
+        LIMIT 1
+        ]]>
+    </select>
+
+    <!-- 사용자 수정 -->
+    <update id="update" parameterType="com.example.spring.user.UserDto">
+        <![CDATA[
+        UPDATE USERS SET
+            USERNAME = #{username}, 
+            PHONE = #{phone}, 
+            EMAIL = #{email}
+        WHERE USER_ID = #{userId} LIMIT 1
+        ]]>
+    </update>
+
+    <!-- 사용자 비밀번호 수정 -->
+    <update id="updatePassword" parameterType="com.example.spring.user.UserDto">
+        <![CDATA[
+        UPDATE USERS SET PASSWORD = #{password} WHERE USER_ID = #{userId} LIMIT 1
+        ]]>
+    </update>
+
+    <!-- 사용자 삭제 -->
+    <delete id="delete" parameterType="com.example.spring.user.UserDto">
+        <![CDATA[
+        DELETE FROM USERS WHERE USER_ID = #{userId} LIMIT 1
+        ]]>
+    </delete>
+
+    <!-- 사용자 수 -->
+    <select id="totalCount" resultType="int">
+        <![CDATA[
+        SELECT COUNT(*) FROM USERS WHERE 1=1
+        ]]>
+        <if test="searchType != null and searchKeyword != null">
+            <choose>
+                <when test="searchType == 'userId'">
+                    <![CDATA[
+                    AND USER_ID LIKE CONCAT('%', #{searchKeyword}, '%')
+                    ]]>
+                </when>
+                <when test="searchType == 'username'">
+                    <![CDATA[
+                    AND USERNAME LIKE CONCAT('%', #{searchKeyword}, '%')
+                    ]]>
+                </when>
+                <when test="searchType == 'phone'">
+                    <![CDATA[
+                    AND PHONE LIKE CONCAT('%', #{searchKeyword}, '%')
+                    ]]>
+                </when>
+                <when test="searchType == 'email'">
+                    <![CDATA[
+                    AND EMAIL LIKE CONCAT('%', #{searchKeyword}, '%')
+                    ]]>
+                </when>
+                <when test="searchType == 'all'">
+                <![CDATA[
+                    AND (
+                        USER_ID LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR USERNAME LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR PHONE LIKE CONCAT('%', #{searchKeyword}, '%')
+                        OR EMAIL LIKE CONCAT('%', #{searchKeyword}, '%')
+                    )
+                ]]>
+                </when>
+            </choose>
+        </if>
+    </select>
+
+</mapper>
