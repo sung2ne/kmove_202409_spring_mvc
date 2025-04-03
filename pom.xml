@@ -163,6 +163,20 @@
             <artifactId>jackson-annotations</artifactId>
             <version>2.15.3</version>
         </dependency>
+
+        <!-- coolsms -->
+        <dependency>
+            <groupId>net.nurigo</groupId>
+            <artifactId>sdk</artifactId>
+            <version>4.2.7</version>
+        </dependency>
+
+        <!-- email -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
     </dependencies>
 
     <!-- 빌드 설정 -->

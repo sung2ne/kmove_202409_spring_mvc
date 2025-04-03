@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.spring.libs.Email;
+import com.example.spring.libs.Sms;
 import com.example.spring.user.UserDto;
 import com.example.spring.user.UserService;
 
@@ -124,7 +126,7 @@ public class AuthController {
         // 로그인 되어 있으면 posts 페이지로 리다이렉트
         if (request.getSession().getAttribute("userId") != null) {
             return ("redirect:/posts");
-        }
+        }        
 
         return ("auth/findUserId");
     }
@@ -163,6 +165,13 @@ public class AuthController {
 
         // 사용자 정보가 있으면 사용자 아이디 전달
         if (user != null) {
+            if (phone != null) {
+                Sms coolSMS = new Sms();
+                coolSMS.sendSmsViaCoolsms("사용자 아이디는 " + user.getUserId() + " 입니다.", phone);
+            } else if (email != null) {
+                Email emailService = new Email();
+                emailService.sendEmailViaNaver("아이디 찾기", "사용자 아이디는 " + user.getUserId() + " 입니다.", email);
+            }            
             redirectAttributes.addFlashAttribute("successMessage", "사용자 아이디는 " + user.getUserId() + " 입니다.");
             return ("redirect:/auth/find-user-id");
         }
@@ -222,6 +231,13 @@ public class AuthController {
 
             // 비밀번호 초기화 성공
             if (result) {
+                if (phone != null) {
+                    Sms coolSMS = new Sms();
+                    coolSMS.sendSmsViaCoolsms("임시비밀번호는 " + newPassword + " 입니다.", phone);
+                } else if (email != null) {
+                    Email emailService = new Email();
+                    emailService.sendEmailViaNaver("비밀번호 초기화", "임시비밀번호는 " + newPassword + " 입니다.", email);
+                }
                 redirectAttributes.addFlashAttribute("successMessage", "임시비밀번호는 " + newPassword + " 입니다.");
                 return ("redirect:/auth/login");
             }

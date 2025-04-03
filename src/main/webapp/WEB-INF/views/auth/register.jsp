@@ -59,13 +59,12 @@
                         </label>
                         <input type="text" class="form-control" id="phone" name="phone" placeholder="전화번호를 입력하세요">
                     </div>
+                <div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">회원가입</button>
+                    <a href="/auth/login" class="btn btn-secondary">취소</a>
                 </div>
-            </div>
-            <%-- 버튼 --%>
-            <div>
-                <button type="submit" class="btn btn-primary">회원가입</button>
-                <a href="/auth/login" class="btn btn-secondary">취소</a>
-            </div>
+            </div>            
         </form>
     </div>
 </div>
