@@ -20,7 +20,7 @@
                     <%-- 아이디 --%>
                     <div class="mb-3">
                         <label for="userId" class="form-label">
-                            <span class="text-danger">*</span> 아이디
+                            <span class="text-danger">*</span> 아이디 (아이디는 6자 이상 12자 이하로 입력하세요.)
                         </label>
                         <input type="text" class="form-control" id="userId" name="userId" placeholder="아이디를 입력하세요">
                     </div>
@@ -41,7 +41,7 @@
                     <%-- 이름 --%>
                     <div class="mb-3">
                         <label for="username" class="form-label">
-                            <span class="text-danger">*</span> 작성자
+                            <span class="text-danger">*</span> 이름
                         </label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="이름을 입력하세요">
                     </div>
@@ -55,7 +55,7 @@
                     <%-- 전화번호 --%>
                     <div class="mb-3">
                         <label for="phone" class="form-label">
-                            <span class="text-danger">*</span> 전화번호
+                            <span class="text-danger">*</span> 전화번호 (숫자만 입력하세요.)
                         </label>
                         <input type="text" class="form-control" id="phone" name="phone" placeholder="전화번호를 입력하세요">
                     </div>
@@ -76,6 +76,22 @@
 <%-- script --%>
 <script>
     $(document).ready(function() {
+        // 아이디 입력 검증
+        $('#userId').on('keypress', function(e) {
+            // 영문자, 숫자만 허용
+            if (!/[a-zA-Z0-9]/.test(String.fromCharCode(e.which)) && e.which != 8 && e.which != 0) {
+                e.preventDefault();
+            }
+        }).on('input', function() {
+            // 영문자, 숫자만 남기기
+            let userId = $(this).val().replace(/[^a-zA-Z0-9]/g, '');
+
+            // 입력 값이 12자리 이상일 때 12자리로 제한
+            if (userId.length > 12) {
+                $(this).val(userId.substring(0, 12));
+            }
+        });
+
         // 전화번호 입력 제한 및 형식화
         $('#phone').on('keypress', function(e) {
             // 숫자 키(0-9)만 허용, 그 외 입력은 차단
@@ -108,12 +124,25 @@
         });
 
         // 회원가입 폼 유효성 검사
-        $('#registerForm').val({
-            rulue: {
+        $('#registerForm').validate({
+            rules: {
                 userId: {
                     required: true,
                     minlength: 6,
-                    maxlength: 20
+                    maxlength: 12,
+                    remote: {
+                        url: '/auth/check-user-id',
+                        type: 'post',
+                        data: {
+                            userId: function() {
+                                return $('#userId').val();
+                            },
+                        },
+                        dataFilter: function(response) {
+                            const data = JSON.parse(response);
+                            return !data.exists;
+                        }
+                    }
                 },
                 password: {
                     required: true,
@@ -133,18 +162,44 @@
                 },
                 email: {
                     required: true,
-                    email: true
+                    email: true,
+                    remote: {
+                        url: '/auth/check-email',
+                        type: 'post',
+                        data: {
+                            email: function() {
+                                return $('#email').val();
+                            },
+                        },
+                        dataFilter: function(response) {
+                            const data = JSON.parse(response);
+                            return !data.exists;
+                        }
+                    }
                 },
                 phone: {
-                    required: true,                 
-                    pattern: phonePattern
+                    required: true,
+                    remote: {
+                        url: '/auth/check-phone',
+                        type: 'post',
+                        data: {
+                            phone: function() {
+                                return $('#phone').val();
+                            },
+                        },
+                        dataFilter: function(response) {
+                            const data = JSON.parse(response);
+                            return !data.exists;
+                        }
+                    }
                 }
             },
-            message: {
+            messages: {
                 userId: {
                     required: '아이디를 입력하세요.',
-                    minlength: '아이디는 6자 이상 20자 이하로 입력하세요.',
-                    maxlength: '아이디는 6자 이상 20자 이하로 입력하세요.'
+                    minlength: '아이디는 6자 이상 12자 이하로 입력하세요.',
+                    maxlength: '아이디는 6자 이상 12자 이하로 입력하세요.',
+                    remote: '이미 사용중인 아이디입니다.'
                 },
                 password: {
                     required: '비밀번호를 입력하세요.',
@@ -162,11 +217,12 @@
                 },
                 email: {
                     required: '이메일을 입력하세요.',
-                    email: '이메일 형식이 올바르지 않습니다.'
+                    email: '이메일 형식이 올바르지 않습니다.',
+                    remote: '이미 사용중인 이메일입니다.'
                 },
                 phone: {
                     required: '전화번호를 입력하세요.',
-                    pattern: '전화번호 형식이 올바르지 않습니다.'
+                    remote: '이미 사용중인 전화번호입니다.'
                 }
             },
             errorClass: 'is-invalid',

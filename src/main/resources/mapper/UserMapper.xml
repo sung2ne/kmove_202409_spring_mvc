@@ -130,18 +130,30 @@
     <!-- 사용자 수정 -->
     <update id="update" parameterType="com.example.spring.user.UserDto">
         <![CDATA[
-        UPDATE USERS SET
-            USERNAME = #{username}, 
-            PHONE = #{phone}, 
-            EMAIL = #{email}
-        WHERE USER_ID = #{userId} LIMIT 1
+        UPDATE USERS SET USER_ID = #{userId}
         ]]>
-    </update>
-
-    <!-- 사용자 비밀번호 수정 -->
-    <update id="updatePassword" parameterType="com.example.spring.user.UserDto">
+        <if test="username != null">
+            <![CDATA[
+            , USERNAME = #{username}
+            ]]>
+        </if>
+        <if test="phone != null">
+            <![CDATA[
+            , PHONE = #{phone}
+            ]]>
+        </if>
+        <if test="email != null">
+            <![CDATA[
+            , EMAIL = #{email}
+            ]]>
+        </if>
+        <if test="password != null">
+            <![CDATA[
+            , PASSWORD = #{password}
+            ]]>
+        </if>
         <![CDATA[
-        UPDATE USERS SET PASSWORD = #{password} WHERE USER_ID = #{userId} LIMIT 1
+        WHERE USER_ID = #{userId} LIMIT 1
         ]]>
     </update>
 

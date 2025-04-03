@@ -1,14 +1,20 @@
 package com.example.spring.auth;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.spring.user.UserDto;
@@ -120,7 +126,7 @@ public class AuthController {
             return ("redirect:/posts");
         }
 
-        return ("auth/find-user-id");
+        return ("auth/findUserId");
     }
 
     // 아이디 찾기 (POST, 처리)
@@ -322,4 +328,78 @@ public class AuthController {
         return ("redirect:/auth/profile/delete");
     }
 
+    // 사용자 아이디 중복 체크 (POST, 처리)
+    @PostMapping("/check-user-id")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> checkUserIdPost(@RequestParam(value = "userId") String userId) {
+        // 사용자 정보 조회
+        UserDto user = new UserDto();
+        user.setUserId(userId);
+        user = UserService.read(user);
+
+        Map<String, Object> response = new HashMap<>();
+
+        // 사용자 아이디가 존재하는 경우
+        if (user != null) {
+            response.put("exists", true);
+        } 
+        // 사용자가 존재하지 않는 경우
+        else {
+            response.put("exists", false);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
+    }
+
+    // 사용자 이메일 중복 체크 (POST, 처리)
+    @PostMapping("/check-email")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> checkEmailPost(@RequestParam(value = "email") String email) {
+        // 사용자 정보 조회
+        UserDto user = new UserDto();
+        user.setEmail(email);
+        user = UserService.read(user);
+
+        Map<String, Object> response = new HashMap<>();
+
+        // 사용자가 존재하는 경우
+        if (user != null) {
+            response.put("exists", true);
+        } 
+        // 사용자 아이디가 존재하지 않는 경우
+        else {
+            response.put("exists", false);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
+    }
+
+    // 사용자 전화번호 중복 체크 (POST, 처리)
+    @PostMapping("/check-phone")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> checkPhonePost(@RequestParam(value = "phone") String phone) {
+        // 사용자 정보 조회
+        UserDto user = new UserDto();
+        user.setPhone(phone);
+        user = UserService.read(user);
+
+        Map<String, Object> response = new HashMap<>();
+
+        // 사용자가 존재하는 경우
+        if (user != null) {
+            response.put("exists", true);
+        } 
+        // 사용자 아이디가 존재하지 않는 경우
+        else {
+            response.put("exists", false);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
+    }
 }

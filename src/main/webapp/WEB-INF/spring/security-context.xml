@@ -11,8 +11,11 @@
             <exclude-mapping path="/auth/register" />
             <exclude-mapping path="/auth/login" />
             <exclude-mapping path="/auth/logout" />
-            <exclude-mapping path="/auth/find-userid" />
+            <exclude-mapping path="/auth/find-user-id" />
             <exclude-mapping path="/auth/reset-password" />
+            <exclude-mapping path="/auth/check-user-id" />
+            <exclude-mapping path="/auth/check-email" />
+            <exclude-mapping path="/auth/check-phone" />
             <exclude-mapping path="/static/**" />
             <beans:bean class="com.example.spring.interceptor.AuthInterceptor" />
         </interceptor>
