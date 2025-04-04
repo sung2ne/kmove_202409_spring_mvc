@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +30,9 @@ public class AuthController {
     @Autowired
     UserService UserService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     // 로그인 (GET, 화면)
     @GetMapping("/login")
     public String loginGet(HttpServletRequest request) {
@@ -46,8 +50,8 @@ public class AuthController {
     public String loginPost(
         HttpServletRequest request,
         RedirectAttributes redirectAttributes,
-        @RequestParam(value = "userId", required = false) String userId,
-        @RequestParam(value = "password", required = false) String password
+        @RequestParam(value = "userId") String userId,
+        @RequestParam(value = "password") String password
     ) {
         // 로그인 되어 있으면 posts 페이지로 리다이렉트
         if (request.getSession().getAttribute("userId") != null) {
@@ -62,7 +66,7 @@ public class AuthController {
         UserDto user = UserService.read(loginUser);
 
         // 사용자 아이디와 비밀번호 검증
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             redirectAttributes.addFlashAttribute("userId", userId);
             redirectAttributes.addFlashAttribute("errorMessage", "아이디와 비밀번호를 확인하세요.");
             return ("redirect:/auth/login");
@@ -188,7 +192,7 @@ public class AuthController {
             return ("redirect:/posts");
         }
 
-        return ("auth/reset-password");
+        return ("auth/resetPassword");
     }
 
     // 비밀번호 초기화 (POST, 처리)
