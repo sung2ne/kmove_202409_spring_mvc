@@ -328,7 +328,7 @@ public class AuthController {
         }
 
         redirectAttributes.addFlashAttribute("errorMessage", "비밀번호 수정에 실패했습니다.");
-        return ("redirect:/profile/update-password");
+        return ("redirect:/auth/update-password");
     }
 
     // 사용자 탈퇴 (GET, 화면)
