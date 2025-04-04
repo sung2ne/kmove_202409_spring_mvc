@@ -253,12 +253,21 @@ public class AuthController {
 
     // 사용자 프로필 (GET, 화면)
     @GetMapping("/profile")
-    public String profileGet() {
+    public String profileGet(HttpServletRequest request, Model model) {
+        // 세션에서 userId 가져오기
+        String userId = (String) request.getSession().getAttribute("userId");
+
+        // 사용자 정보 조회
+        UserDto user = new UserDto();
+        user.setUserId(userId);
+        user = UserService.read(user);
+
+        model.addAttribute("profile", user);
         return ("auth/profile");
     }
 
     // 사용자 프로필 수정 (GET, 화면)
-    @GetMapping("/profile/update")
+    @GetMapping("/update-profile")
     public String updateGet(HttpServletRequest request, Model model) {
         // 세션에서 userId 가져오기
         String userId = (String) request.getSession().getAttribute("userId");
@@ -267,14 +276,19 @@ public class AuthController {
         UserDto user = new UserDto();
         user.setUserId(userId);
         user = UserService.read(user);
-        model.addAttribute("user", user);
 
-        return ("auth/profile-update");
+        model.addAttribute("profile", user);
+        return ("auth/updateProfile");
     }
 
     // 사용자 프로필 수정 (POST, 처리)
-    @PostMapping("/profile/update")
-    public String updatePost(UserDto user, RedirectAttributes redirectAttributes) {
+    @PostMapping("/update-profile")
+    public String updatePost(UserDto user, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        // 세션에서 userId 가져오기
+        String userId = (String) request.getSession().getAttribute("userId");
+
+        // 사용자 정보 수정
+        user.setUserId(userId);
         boolean result = UserService.update(user);
 
         if (result) {
@@ -287,13 +301,13 @@ public class AuthController {
     }
 
     // 사용자 비밀번호 수정 (GET, 화면)
-    @GetMapping("/profile/update-password")
+    @GetMapping("/update-password")
     public String updatePasswordGet() {
-        return ("auth/profile-update-password");
+        return ("auth/updatePassword");
     }
 
     // 사용자 비밀번호 수정 (POST, 처리)
-    @PostMapping("/profile/update-password")
+    @PostMapping("/update-password")
     public String updatePasswordPost(
         @RequestParam(value = "password") String password,
         HttpServletRequest request, 
@@ -310,7 +324,7 @@ public class AuthController {
 
         if (result) {
             redirectAttributes.addFlashAttribute("successMessage", "비밀번호가 수정되었습니다.");
-            return ("redirect:/auth/profile");
+            return ("redirect:/auth/logout");
         }
 
         redirectAttributes.addFlashAttribute("errorMessage", "비밀번호 수정에 실패했습니다.");

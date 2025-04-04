@@ -11,7 +11,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 로그인하지 않은 경우, 로그인 페이지로 리디렉트
         if (request.getSession().getAttribute("userId") == null) {            
-            response.sendRedirect("/logout");
+            response.sendRedirect("/auth/logout");
             return false;
         }
 
