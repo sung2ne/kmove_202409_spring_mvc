@@ -80,19 +80,6 @@ public class UserDao {
         return result;
     }
 
-    // 사용자 비밀번호 수정
-    public int updatePassword(UserDto user) {
-        int result = -1;
-
-        try {
-            result = sqlSession.update(namespace + ".updatePassword", user);
-        } catch (DataAccessException e) {
-            logger.error("사용자 비밀번호 수정 오류 : {}", e.getMessage(), e);
-        }
-
-        return result;
-    }
-
     // 사용자 삭제
     public int delete(String userId) {
         int result = -1;
