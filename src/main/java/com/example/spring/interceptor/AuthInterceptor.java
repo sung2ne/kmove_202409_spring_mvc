@@ -15,6 +15,16 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
 
+        // /users 로 시작하는 URL은 관리자만 접근 가능
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/users")) {
+            String role = (String) request.getSession().getAttribute("role");
+            if (!"관리자".equals(role)) {
+                response.sendRedirect("/auth/logout");
+                return false;
+            }
+        }
+
         return true; // 로그인한 경우 계속 진행
     }
 }

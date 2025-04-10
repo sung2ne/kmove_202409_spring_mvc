@@ -9,6 +9,7 @@
         <result property="username" column="USERNAME" />
         <result property="phone" column="PHONE" />
         <result property="email" column="EMAIL" />
+        <result property="role" column="ROLE" />
         <result property="createdAt" column="CREATED_AT" />
         <result property="updatedAt" column="UPDATED_AT" />
     </resultMap>
@@ -41,6 +42,7 @@
             USERNAME,
             PHONE,
             EMAIL,
+            ROLE,
             CREATED_AT,
             UPDATED_AT
         FROM
@@ -96,6 +98,7 @@
             USERNAME,
             PHONE,
             EMAIL,
+            ROLE,
             CREATED_AT,
             UPDATED_AT
         FROM

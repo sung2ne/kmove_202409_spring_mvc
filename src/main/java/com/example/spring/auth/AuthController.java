@@ -75,6 +75,7 @@ public class AuthController {
         // 세션에 사용자 정보 저장
         request.getSession().setAttribute("userId", user.getUserId());
         request.getSession().setAttribute("userName", user.getUsername());
+        request.getSession().setAttribute("role", user.getRole());
 
         // http://localhost:8080/posts 로 리다이렉트
         return ("redirect:/posts"); 
