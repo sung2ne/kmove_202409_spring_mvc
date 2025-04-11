@@ -69,9 +69,7 @@
 <%-- script --%>
 <script>
     $(document).ready(function() {
-        $("#createForm").submit(function(event) {
-            event.preventDefault();
-            
+        $("#createForm").submit(function(event) {            
             // 제목 유효성 검사
             if ($("#title").val() == "") {
                 alert("제목을 입력하세요.");
@@ -99,8 +97,6 @@
                 $("#password").focus();
                 return false;
             }
-            
-            return true;
         });
     });
 </script>
