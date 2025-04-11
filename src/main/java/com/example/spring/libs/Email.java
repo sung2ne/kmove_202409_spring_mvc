@@ -17,7 +17,7 @@ public class Email {
     // 네이버 메일 보내기
     public void sendEmailViaNaver(String mailSubject, String mailContent, String mailTo) {
         // 이메일 전송 설정
-        String mailFrom = "sung3ne@naver.com";  // 발신자 이메일
+        String mailFrom = "이메일";  // 발신자 이메일
 
         // 이메일 전송 properties 설정
         Properties props = new Properties();

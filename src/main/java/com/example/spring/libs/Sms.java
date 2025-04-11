@@ -16,7 +16,7 @@ public class Sms {
         DefaultMessageService messageService =  NurigoApp.INSTANCE.initialize(apiKey, secretKey, apiUrl);
         // Message 패키지가 중복될 경우 net.nurigo.sdk.message.model.Message로 치환하여 주세요
         Message message = new Message();
-        message.setFrom("01059118108");
+        message.setFrom("전화번호");
         message.setTo(phone);
         message.setText(smsMessage);
 
