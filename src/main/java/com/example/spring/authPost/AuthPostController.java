@@ -31,13 +31,14 @@ public class AuthPostController {
     @Autowired
     AuthPostService authPostService;
 
-    // private final String uploadPath = "C:/upload/post"; // 파일 업로드 경로
-    private final String uploadPath = "/Users/jeongps/Developments/upload/post"; // 파일 업로드 경로
+    // private final String uploadPath = "C:/upload/auth-post"; // 파일 업로드 경로
+    private final String uploadPath = "/Users/jeongps/Developments/upload/auth-post"; // 파일 업로드 경로
 
     // 게시글 등록 (화면, GET)
     @GetMapping("/create")
     public String createGet() {
-        return "post/create";
+        // authPost/create.jsp
+        return "authPost/create";
     }
 
     // 게시글 등록 (처리, POST)
@@ -108,7 +109,9 @@ public class AuthPostController {
         model.addAttribute("pagination", result.get("pagination"));
         model.addAttribute("searchKeyword", searchKeyword);
         model.addAttribute("searchType", searchType);
-        return "post/list";
+
+        // authPost/list.jsp
+        return "authPost/list";
     }
 
     // 게시글 보기 (화면, GET)
@@ -116,20 +119,46 @@ public class AuthPostController {
     public String readGet(@PathVariable("id") int id, Model model) {
         AuthPostDto post = authPostService.read(id);
         model.addAttribute("post", post);
-        return "post/read";
+
+        // authPost/read.jsp
+        return "authPost/read";
     }
 
     // 게시글 수정 (화면, GET)
     @GetMapping("/{id}/update")
-    public String updateGet(@PathVariable("id") int id, Model model) {
+    public String updateGet(
+        @PathVariable("id") int id, 
+        Model model,  
+        RedirectAttributes redirectAttributes, 
+        HttpServletRequest request
+    ) {
+        // 세션에서 userId 가져오기
+        String userId = (String) request.getSession().getAttribute("userId");
+
+        // 게시글 정보 조회
         AuthPostDto post = authPostService.read(id);
+
+        // 등록한 사용자 아이디와 세션의 사용자 아이디가 다르면 수정 불가
+        if (!post.getUserId().equals(userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "게시글 수정 권한이 없습니다.");
+            return "redirect:/auth/logout";
+        }
+
+        // 등록한 사용자 아이디와 세션의 사용자 아이디가 같으면 수정 가능
         model.addAttribute("post", post);
-        return "post/update";
+
+        // authPost/update.jsp
+        return "authPost/update";
     }
 
     // 게시글 수정 (처리, POST)
     @PostMapping("/{id}/update")
-    public String updatePost(@PathVariable("id") int id, AuthPostDto post, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+    public String updatePost(
+        @PathVariable("id") int id, 
+        AuthPostDto post, 
+        RedirectAttributes redirectAttributes, 
+        HttpServletRequest request
+    ) {
         // 세션에서 userId 가져오기
         String userId = (String) request.getSession().getAttribute("userId");
         post.setUserId(userId);
@@ -138,6 +167,12 @@ public class AuthPostController {
             // 기존 게시글 정보 조회
             post.setId(id);
             AuthPostDto originalPost = authPostService.read(post.getId());
+
+            // 등록한 사용자 아이디와 세션의 사용자 아이디가 다르면 수정 불가
+            if (!originalPost.getUserId().equals(userId)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "게시글 수정 권한이 없습니다.");
+                return "redirect:/auth/logout";
+            }
 
             // 업로드 파일 정보
             MultipartFile uploadFile = post.getUploadFile();
@@ -196,11 +231,28 @@ public class AuthPostController {
 
     // 게시글 삭제 (처리, POST)
     @PostMapping("/{id}/delete")
-    public String deletePost(@PathVariable int id, AuthPostDto post, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+    public String deletePost(
+        @PathVariable int id, 
+        AuthPostDto post, 
+        RedirectAttributes 
+        redirectAttributes, 
+        HttpServletRequest request
+    ) {
         // 세션에서 userId 가져오기
         String userId = (String) request.getSession().getAttribute("userId");
-        post.setUserId(userId);
 
+        // 게시글 정보 조회
+        AuthPostDto originalPost = authPostService.read(id);
+
+        // 등록한 사용자 아이디와 세션의 사용자 아이디가 다르면 수정 불가
+        if (!originalPost.getUserId().equals(userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "게시글 수정 권한이 없습니다.");
+            return "redirect:/auth/logout";
+        }
+
+        // 문제 1. 기존 파일 삭제
+
+        // 게시글 삭제
         post.setId(id);
         boolean deleted = authPostService.delete(post);
 
