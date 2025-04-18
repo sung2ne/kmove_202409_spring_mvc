@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="authPostMapper">
+
+    <resultMap id="postResultMap" type="com.example.spring.authPost.AuthPostDto">
+        <!-- 게시글 정보 -->
+        <result property="id" column="ID" />
+        <result property="title" column="TITLE" />
+        <result property="content" column="CONTENT" />
+        <result property="userId" column="USER_ID" />
+        <result property="createdAt" column="CREATED_AT" />
+        <result property="updatedAt" column="UPDATED_AT" />
+        <result property="fileName" column="FILE_NAME" />
+        <result property="originalFileName" column="ORIGINAL_FILE_NAME" />
+
+        <!-- 사용자 정보 -->
+        <result property="username" column="USERNAME" />
+        <result property="email" column="EMAIL" />
+        <result property="phone" column="PHONE" />
+    </resultMap>
+
+    <!-- 게시글 등록 -->
+    <insert id="create" parameterType="com.example.spring.authPost.AuthPostDto" useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+        INSERT INTO AUTH_POSTS (
+            TITLE, 
+            CONTENT, 
+            USER_ID,
+            FILE_NAME,
+            ORIGINAL_FILE_NAME
+        ) VALUES (
+            #{title}, 
+            #{content}, 
+            #{userId}, 
+            #{fileName},
+            #{originalFileName}
+        )
+        ]]>
+    </insert>
+
+    <!-- 게시글 목록 -->
+    <select id="list" resultMap="postResultMap">
+        <![CDATA[
+        SELECT
+            A.ID,
+            A.TITLE,
+            A.CONTENT,
+            A.USER_ID,
+            A.CREATED_AT,
+            A.UPDATED_AT,
+            A.FILE_NAME,
+            A.ORIGINAL_FILE_NAME,
+            B.USERNAME,
+            B.EMAIL,
+            B.PHONE
+        FROM
+            AUTH_POSTS AS A
+            INNER JOIN USERS AS B
+            ON A.USER_ID = B.USER_ID
+        WHERE 1=1
+        ]]>
+        <if test="searchType != null and searchKeyword != null">
+            <choose>
+                <when test="searchType == 'title'">
+                <![CDATA[
+                    AND A.TITLE LIKE CONCAT('%', #{searchKeyword}, '%')
+                ]]>
+                </when>
+                <when test="searchType == 'content'">
+                <![CDATA[
+                    AND A.CONTENT LIKE CONCAT('%', #{searchKeyword}, '%')
+                ]]>
+                </when>
+                <when test="searchType == 'username'">
+                <![CDATA[
+                    AND B.USERNAME LIKE CONCAT('%', #{searchKeyword}, '%')
+                ]]>
+                </when>
+                <when test="searchType == 'all'">
+                <![CDATA[
+                    AND (
+                        A.TITLE LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR A.CONTENT LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR B.USERNAME LIKE CONCAT('%', #{searchKeyword}, '%')
+                    )
+                ]]>
+                </when>
+            </choose>
+        </if>
+        <![CDATA[
+        ORDER BY
+            A.ID DESC
+        LIMIT #{offset}, #{listCountPerPage}
+        ]]>
+    </select>
+
+    <!-- 게시글 보기 -->
+    <select id="read" resultMap="postResultMap">
+        <![CDATA[
+        SELECT
+            A.ID,
+            A.TITLE,
+            A.CONTENT,
+            A.USER_ID,
+            A.CREATED_AT,
+            A.UPDATED_AT,
+            A.FILE_NAME,
+            A.ORIGINAL_FILE_NAME,
+            B.USERNAME,
+            B.EMAIL,
+            B.PHONE
+        FROM
+            AUTH_POSTS AS A
+            INNER JOIN USERS AS B
+            ON A.USER_ID = B.USER_ID
+        WHERE
+            A.ID = #{id}
+        LIMIT 1
+        ]]>
+    </select>
+
+    <!-- 게시글 수정 -->
+    <update id="update" parameterType="com.example.spring.authPost.AuthPostDto">
+        <![CDATA[
+        UPDATE
+            AUTH_POSTS
+        SET
+            TITLE = #{title},
+            CONTENT = #{content},
+            FILE_NAME = #{fileName},
+            ORIGINAL_FILE_NAME = #{originalFileName}
+        WHERE
+            ID = #{id}
+        LIMIT 1
+        ]]>
+    </update>
+
+    <!-- 게시글 삭제 -->
+    <delete id="delete">
+        <![CDATA[
+        DELETE FROM
+            AUTH_POSTS
+        WHERE
+            ID = #{id}
+        LIMIT 1
+        ]]>
+    </delete>
+
+    <!-- 전체 게시글 수 조회 -->
+    <select id="totalCount" resultType="int">
+        <![CDATA[
+        SELECT 
+            COUNT(*) 
+        FROM 
+            AUTH_POSTS AS A
+            INNER JOIN USERS AS B
+            ON A.USER_ID = B.USER_ID
+        WHERE 1=1
+        ]]>
+        <if test="searchType != null and searchType != null">
+            <choose>
+                <when test="searchType == 'title'">
+                <![CDATA[
+                    AND A.TITLE LIKE CONCAT('%', #{searchKeyword}, '%')
+                ]]>
+                </when>
+                <when test="searchType == 'content'">
+                <![CDATA[
+                    AND A.CONTENT LIKE CONCAT('%', #{searchKeyword}, '%')
+                ]]>
+                </when>
+                <when test="searchType == 'username'">
+                <![CDATA[
+                    AND B.USERNAME LIKE CONCAT('%', #{searchKeyword}, '%')
+                ]]>
+                </when>
+                <when test="searchType == 'all'">
+                <![CDATA[
+                    AND (
+                        A.TITLE LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR A.CONTENT LIKE CONCAT('%', #{searchKeyword}, '%') 
+                        OR B.USERNAME LIKE CONCAT('%', #{searchKeyword}, '%')
+                    )
+                ]]>
+                </when>
+            </choose>
+        </if>
+    </select>
+
+</mapper>
